@@ -498,10 +498,10 @@ CLEANUP:
 
 RECV_OUTPUT:
 	const int dwResultBufferSize = 1024;
-	const DWORD timeout = 1000;
+	const DWORD timeout = 1000 * 10;
 	char pszResultBuffer[dwResultBufferSize];
 
-	WaitForSingleObject(pi.hProcess, timeout);
+	// WaitForSingleObject(pi.hProcess, timeout);
 	CloseHandle(hWritePipe);
 
 	printf("\n====================CMD===================\n%ws\n", command);
@@ -510,7 +510,7 @@ RECV_OUTPUT:
 	DWORD n = 0;
 	do {
 		RtlZeroMemory(pszResultBuffer, dwResultBufferSize);
-		ReadFile(hReadPipe, pszResultBuffer, dwResultBufferSize, &n, NULL);
+		if (!ReadFile(hReadPipe, pszResultBuffer, dwResultBufferSize, &n, NULL)) break;
 		printf("%s", pszResultBuffer);
 		// if (pszResultBuffer[n] == EOF) break;
 	} while (n);
