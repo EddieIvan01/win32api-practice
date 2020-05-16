@@ -498,7 +498,7 @@ CLEANUP:
 
 RECV_OUTPUT:
 	const int dwResultBufferSize = 1024;
-	const DWORD timeout = 1000 * 10;
+	// const DWORD timeout = 1000 * 10;
 	char pszResultBuffer[dwResultBufferSize];
 
 	// WaitForSingleObject(pi.hProcess, timeout);
