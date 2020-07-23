@@ -189,6 +189,8 @@ int wmain(int argc, wchar_t* argv[]) {
     hHook = SetWindowsHookEx(
         WH_KEYBOARD_LL,
         KeyBoardHookProc,
+		// WH_KEYBOARD_LL hook is global only, 
+		// and is called in the context of the thread that installed it
         GetModuleHandle(NULL),
         0
     );
