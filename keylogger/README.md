@@ -12,6 +12,8 @@ Hello, world!<CTRL>a<BACK>This is my password:<ENTER>P455e<BACK>w0&D../<LEFT><LE
 <CTRL>c
 ```
 
+***
+
 The `WH_KEYBOARD_LL` hook is a global only hook, means the dwThreadId must be zero. And the callback function will be invoked by the thread which installed the hook
 
 > MSDN
