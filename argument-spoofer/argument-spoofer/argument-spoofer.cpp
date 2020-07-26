@@ -111,6 +111,7 @@ int wmain(int argc, wchar_t* argv[]) {
     }
 
     ResumeThread(pi.hThread);
+    WaitForSingleObject(pi.hThread, INFINITE);
 CLEANUP:
     free(lpBuffer);
     free(lwszSpoofCmd);
