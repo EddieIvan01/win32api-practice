@@ -1,6 +1,6 @@
 # OXIDNicResolver
 
-Retrieve nic's network address(NetBIOS, Domain name, IPv4, IPv6 or another protocol sequence) from remote machine via RPC/135 without authentication
+Retrieve nic's network address(NetBIOS, FQDN, IPv4, IPv6 or another protocol sequence) from remote machine via RPC/135 without authentication
 
 Different from other implementations on GitHub, this proj is implemented with native API: invoke `IObjectExporter::ServerAlive2`, then parse the StringBindings
 
@@ -49,4 +49,4 @@ The idl is compiled as x64, you should recompile it on the compatible arch while
 
 以上是事后总结的几个坑，当然还有不少坑略去了，因为在事后的上帝视角看来有些坑踩得没有意义，纯属走了弯路，自然就没必要记录
 
-对于代码实现，虽然网上(包括MSDN)完全找不到`IObjectExporter::ServerAlive2`的example，例如解析`DUALSTRINGARRAY`，但找一些片段资料还是没问题的
+代码实现其实是相对简单的，虽然网上(包括MSDN)完全找不到`IObjectExporter::ServerAlive2`的example
