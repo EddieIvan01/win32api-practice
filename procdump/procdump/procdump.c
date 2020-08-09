@@ -19,7 +19,6 @@ DWORD GetProcessIdByName(WCHAR* lwszProcessName) {
                 dwProcessId = pe32.th32ProcessID;
                 break;
             }
-            Process32Next(hSnapshot, &pe32);
         }
     } while (FALSE);
 
