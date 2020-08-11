@@ -49,11 +49,13 @@ NTSTATUS ElevateDebugPrivilege() {
 
 BOOL ProcessDump(DWORD dwProcessId, WCHAR* lpFileName) {
     HANDLE hProcess = OpenProcess(
-        PROCESS_QUERY_INFORMATION | PROCESS_VM_READ | PROCESS_DUP_HANDLE,
+        PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
         FALSE, dwProcessId
     );
-    if (hProcess == INVALID_HANDLE_VALUE)
+    if (hProcess == NULL) {
+        wprintf(L"Couldn't open process: %d\n", GetLastError());
         return FALSE;
+    }
 
     HANDLE hFile = CreateFile(
         lpFileName,
@@ -61,6 +63,7 @@ BOOL ProcessDump(DWORD dwProcessId, WCHAR* lpFileName) {
         FILE_SHARE_READ | FILE_SHARE_WRITE,
         NULL, CREATE_ALWAYS, 0, NULL);
     if (hFile == INVALID_HANDLE_VALUE) {
+        wprintf(L"Couldn't create file: %d\n", GetLastError());
         CloseHandle(hProcess);
         return FALSE;
     }
@@ -68,11 +71,14 @@ BOOL ProcessDump(DWORD dwProcessId, WCHAR* lpFileName) {
     if (!MiniDumpWriteDump(
         hProcess, dwProcessId, hFile, MiniDumpWithFullMemory, NULL, NULL, NULL
     )) {
+        wprintf(L"Dump error: %u\n", GetLastError());
         CloseHandle(hProcess);
         CloseHandle(hFile);
         return FALSE;
     }
 
+    CloseHandle(hProcess);
+    CloseHandle(hFile);
     return TRUE;
 }
 
@@ -135,7 +141,7 @@ BOOL CheckAPIHookedAndTryUnHook(WCHAR* lpDllFileName, CHAR* pAPIName) {
     }
     else
         wprintf(L"%s!%S is not hooked\n", lpDllFileName + dwSlashIndex, pAPIName);
-    
+
     return TRUE;
 }
 
@@ -148,13 +154,13 @@ int wmain(int argc, wchar_t* argv[]) {
     if (!CheckAPIHookedAndTryUnHook(L"C:\\windows\\system32\\dbgcore.dll", "MiniDumpWriteDump"))
         wprintf(L"Unhook fail\n");
 
-    WCHAR* lpProcessName = argv[1];
-    WCHAR* lpOutFile = argv[2];
-
     if (ElevateDebugPrivilege() != 0) {
         wprintf(L"Elevate SeDebugPrivilege fail: %d\n", GetLastError());
         return -1;
     }
+
+    WCHAR* lpProcessName = argv[1];
+    WCHAR* lpOutFile = argv[2];
 
     DWORD dwProcessId = GetProcessIdByName(lpProcessName);
     if (dwProcessId == 0) {
@@ -162,10 +168,9 @@ int wmain(int argc, wchar_t* argv[]) {
         return -1;
     }
 
-    if (!ProcessDump(dwProcessId, lpOutFile)) {
-        wprintf(L"Dump error: %d\n", GetLastError());
+    if (!ProcessDump(dwProcessId, lpOutFile))
         return -1;
-    }
+
     wprintf(L"Dump %s to %s\n", lpProcessName, lpOutFile);
     return 0;
 }
