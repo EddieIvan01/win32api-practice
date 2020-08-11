@@ -453,7 +453,6 @@ BOOL CreateProcessWithOutput(HANDLE hToken) {
 
 	ZeroMemory(&si, sizeof(STARTUPINFO));
 	ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
-	memset(&pi, 0x00, sizeof(PROCESS_INFORMATION));
 
 	DWORD sessionId = WTSGetActiveConsoleSessionId();
 
@@ -471,7 +470,6 @@ BOOL CreateProcessWithOutput(HANDLE hToken) {
 	si.hStdOutput = hWritePipe;
 	si.wShowWindow = SW_HIDE;
 	si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
-	si.cb = sizeof(STARTUPINFO);
 	si.lpDesktop = (LPWSTR)L"winsta0\\default";
 
 	fflush(stdout);
