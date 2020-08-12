@@ -4,7 +4,7 @@ Dump full(type 0x02) process memory via `MiniDumpWriteDump`, most commonly be us
 
 Will check if `dbgcore.dll!MiniDumpWriteDump` is inline hooked and try to unhook before invoking
 
-P.s. If lsass.exe is protected by [PPL](https://www.scip.ch/en/?labs.20200116) (`PsProtectedTypeProtectedLight` type and `PsProtectedSignerLsa` signer), it's knotty
+P.s. If lsass.exe is protected by [PPL](https://www.scip.ch/en/?labs.20200116) (`PsProtectedTypeProtectedLight` type and `PsProtectedSignerLsa` signer), it's knotty, you can try [RedCursorSecurityConsulting/PPLKiller](https://github.com/RedCursorSecurityConsulting/PPLKiller) or [Mattiwatti/PPLKiller](https://github.com/Mattiwatti/PPLKiller)
 
 ```
 PS C:\> .\procdump.exe lsass.exe 1.bin
