@@ -18,3 +18,6 @@ PS C:\> ls C:\1.bin
 1.bin
 ```
 
+***
+
+The `sspi_h.h` and `sspi_c.cpp` are generated from sspicli.dll via [TypeLibInfo](https://www.codeproject.com/Articles/276450/Generating-IDL-and-Manifest-Files-with-TypeLibInfo)

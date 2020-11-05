@@ -2,7 +2,7 @@
 
 Inspired by [sensepost/rattler](https://github.com/sensepost/rattler), but improve the way of detecting (using named pipe to detect) 
 
-And same as `rattler`, it could only dig vulnerability of [load-time linking](https://docs.microsoft.com/en-us/cpp/build/linking-an-executable-to-a-dll?view=msvc-160). So in my opinion, they are both useless. The better way to dig DLL hijack is monitoring manually via `ProcessMonitor` 
+And same as `rattler`, it could only dig vulnerability of [runtime dynamic linking](https://docs.microsoft.com/en-us/cpp/build/linking-an-executable-to-a-dll?view=msvc-160). **So in my opinion, they are both useless and unstable**. The better way to dig DLL hijack is monitoring manually via `ProcessMonitor` 
 
 ***
 

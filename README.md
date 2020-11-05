@@ -9,4 +9,4 @@
 + OXIDNicResolver - use native API to retrieve nic's network address from remote machine via RPC/135 without authentication
 + procdump - dump full(type 0x02) process memory via `MiniDumpWriteDump`(unhook if necessary)
 + dump-lsass-via-rpc-addssp - code from [xpn](https://gist.github.com/xpn/c7f6d15bf15750eae3ec349e7ec2380e), use `AddSecurityPackage` RPC call to add(inject) SSP DLL
-+ DllHijackDigger - dig load-time-linking DLL hijack automatically
++ DllHijackDigger - dig runtime dynamic linking DLL hijack automatically
