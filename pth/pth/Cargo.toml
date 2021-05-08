@@ -1,0 +1,18 @@
+[package]
+name = "pth"
+version = "0.1.0"
+authors = ["EddieIvan01 <406917347@qq.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+windows = "0.8.0"
+sysinfo = "0.17.2"
+memoffset = "0.6.3"
+hex = "0.4.3"
+chrono = "0.4.19"
+clap = "2.33.3"
+
+[build-dependencies]
+windows = "0.8.0"
