@@ -11,3 +11,4 @@
 + dump-lsass-via-rpc-addssp - code from [xpn](https://gist.github.com/xpn/c7f6d15bf15750eae3ec349e7ec2380e), use `AddSecurityPackage` RPC call to add(inject) SSP DLL
 + DllHijackDigger - dig runtime dynamic linking DLL hijack automatically
 + pth - mimikatz `sekurlsa::pth` & `sekurlsa::msv` implementations written in pure Rust
++ dyn-import - import Win32 API dynamicly via Rust macros
